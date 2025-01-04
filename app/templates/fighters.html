@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block body%}
+    <div class="container-fluid">
+        <table class="table mt-3 pt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Age</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Country</th>
+                    <th scope="col">Record</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in fighters %}
+                    <tr>
+                        <th scope="row">{{ item.id }}</th>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.age }}</td>
+                        <td> - </td>
+                        <td>{{ item.country }}</td>
+                        <td>{{ item.record }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

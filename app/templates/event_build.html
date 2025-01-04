@@ -1,0 +1,346 @@
+{% extends "base.html" %}
+
+{% block body%}
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/base.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="{{ url_for('static', filename="card-behavior.js") }}"></script>
+
+    <div class="component mt-2 mx-5 pt-2 px-5">
+        <div class="text-center">
+            <h2>{{ event.description }}</h2>
+        </div>
+        <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
+            <div id="sortable-container">
+                {% for fight in fights %}
+                    <div class="sortable-item" data-control="{{ fight.control }}">
+                    <button type="button" class="btn-remove" aria-label="Remove">×</button>
+                    <div class="container-fluid">
+                        <div class="row d-flex align-items-center justify-content-center align-items-center mt-3 pt-3">
+                            <div class="col-sm-1 text-end">
+                                <div class="glove red-glove">
+                                    <img src="{{ url_for('static', filename="default.svg") }}" alt="red-glove">
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-floating">
+                                    <select name="red-fighters[]" class="form-select select-corner" required data-selected-fighter="{{ fight.red_corner_id }}">
+                                        {% for fighter in fighters %}
+                                            <option value="{{ fighter.id }}" {% if fighter.id == fight.red_corner_id %}selected{% endif %}>
+                                                {{ fighter.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <label class="red" for="floatingSelect">Red Corner</label>
+                                    <div class="cartel-info float-start mt-1">
+                                        <span class="cartel-red"></span>
+                                        <img src="{{ url_for('static', filename="info.svg") }}" alt="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-auto fight-option">
+                                <div class="belt">
+                                    <img src="{{ url_for('static', filename="belt.svg") }}" alt="belt" data-belt-dispute="{{ fight.belt_dispute }}">
+                                </div>
+                                <input type="hidden" name="belt[]" value="{{ fight.belt_dispute }}">
+                                <input type="hidden" name="control[]" value="{{ fight.control }}">
+                                <div class="mt-1">
+                                    <span class="vs">vs</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-floating">
+                                    <select name="blue-fighters[]" class="form-select select-corner" required data-selected-fighter="{{ fight.blue_corner_id }}">
+                                        {% for fighter in fighters %}
+                                            <option value="{{ fighter.id }}" {% if fighter.id == fight.blue_corner_id %}selected{% endif %}>
+                                                {{ fighter.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <label class="blue" for="floatingSelect">Blue Corner</label>
+                                    <div class="cartel-info float-end mt-1">
+                                        <img src="{{ url_for('static', filename="info.svg") }}" alt="">
+                                        <span class="cartel-blue"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="glove blue-glove">
+                                    <img src="{{ url_for('static', filename="default.svg") }}" alt="blue-glove">
+                                </div>
+                            </div>
+                            <div class="col-sm-12 d-flex align-items-center justify-content-center">
+                                <div class="col-sm-4 mt-2 pt-2">
+                                    <select name="categories[]" class="form-select form-select-sm text-center category-picker" required>
+                                        <option>Select category</option>
+                                        {% for category in categories %}
+                                            <option value="{{ category.id }}" {% if category.id == fight.category_id %}selected{% endif %}>
+                                                {{ category.description }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                    <div class="sortable-item">
+                    <button type="button" class="btn-remove" aria-label="Remove">×</button>
+                    <div class="container-fluid">
+                        <div class="row d-flex align-items-center justify-content-center align-items-center mt-3 pt-3">
+                            <div class="col-sm-1 text-end">
+                                <div class="glove red-glove">
+                                    <img src="{{ url_for('static', filename="default.svg") }}" alt="red-glove">
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-floating">
+                                    <select name="red-fighters[]" class="form-select select-corner" required>
+                                    </select>
+                                    <label class="red" for="floatingSelect">Red Corner</label>
+                                    <div class="cartel-info float-start mt-1">
+                                        <span class="cartel-red"></span>
+                                        <img src="{{ url_for('static', filename="info.svg") }}" alt="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-auto fight-option">
+                                <div class="belt">
+                                    <img src="{{ url_for('static', filename="belt.svg") }}" alt="belt">
+                                </div>
+                                <input type="hidden" name="belt[]" value="">
+                                <input type="hidden" name="control[]" value="">
+                                <div class="mt-1">
+                                    <span class="vs">vs</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-floating">
+                                    <select name="blue-fighters[]" class="form-select select-corner" required>
+                                    </select>
+                                    <label class="blue" for="floatingSelect">Blue Corner</label>
+                                    <div class="cartel-info float-end mt-1">
+                                        <span class="cartel-blue"></span>
+                                        <img src="{{ url_for('static', filename="info.svg") }}" alt="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="glove blue-glove">
+                                    <img src="{{ url_for('static', filename="default.svg") }}" alt="blue-glove">
+                                </div>
+                            </div>
+                            <div class="col-sm-12 d-flex align-items-center justify-content-center">
+                                <div class="col-sm-4 mt-2 pt-2">
+                                    <select name="categories[]" class="form-select form-select-sm text-center category-picker" required>
+                                        <option>Select category</option>
+                                        {% for category in categories %}
+                                            <option value="{{ category.id }}">
+                                                {{ category.description }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                <span id="add-item" class="btn btn-primary mt-3 w-100">Add fight</span>
+            </div>
+            <input type="submit" id="schedule-event" class="btn btn-success mt-3 w-100" value="Schedule Event">
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sortable = new Sortable(document.getElementById('sortable-container'), {
+                animation: 350,
+                handle: '.sortable-item',
+                draggable: '.sortable-item',
+            });
+
+            const sortableContainer = document.getElementById('sortable-container');
+            const addItemButton = document.getElementById('add-item');
+
+            function addRemoveButtonEvent(button) {
+                button.addEventListener('click', function () {
+                    const sortableItem = this.closest('.sortable-item');
+                    if (sortableItem) {
+                        sortableItem.remove();
+                    }
+                });
+            }
+
+            function addCategoryPickerEvent(selectElement) {
+                selectElement.addEventListener('change', function () {
+                    const parentDiv = this.closest('.row');
+                    const redCornerSelect = parentDiv.querySelector('.red').closest('.form-floating').querySelector('select');
+                    const blueCornerSelect = parentDiv.querySelector('.blue').closest('.form-floating').querySelector('select');
+                    const redCartelSpan = parentDiv.querySelector('.cartel-red').closest('.form-floating').querySelector('span');
+                    const blueCartelSpan = parentDiv.querySelector('.cartel-blue').closest('.form-floating').querySelector('span');
+
+                    if (redCornerSelect && blueCornerSelect) {
+                        const route = `/fighters/${this.value}/category`;
+                        fetchAndPopulateFighters(
+                            route,
+                            redCornerSelect,
+                            blueCornerSelect,
+                            redCartelSpan,
+                            blueCartelSpan,
+                            null
+                        );
+                    }
+                });
+            }
+
+            const initialCategoryPickers = document.getElementsByClassName('category-picker');
+            Array.from(initialCategoryPickers).forEach(categoryPicker => {
+                const selectedCategory = categoryPicker.value;
+
+                if (selectedCategory) {
+                    const parentDiv = categoryPicker.closest('.row');
+                    const redCornerSelect = parentDiv.querySelector('.red').closest('.form-floating').querySelector('select');
+                    const blueCornerSelect = parentDiv.querySelector('.blue').closest('.form-floating').querySelector('select');
+                    const redCartelSpan = parentDiv.querySelector('.cartel-red').closest('.form-floating').querySelector('span');
+                    const blueCartelSpan = parentDiv.querySelector('.cartel-blue').closest('.form-floating').querySelector('span');
+
+                    fetchAndPopulateFighters(
+                        `/fighters/${selectedCategory}/category`,
+                        redCornerSelect,
+                        blueCornerSelect,
+                        redCartelSpan,
+                        blueCartelSpan,
+                        (option, select, fighter) => {
+                            if (select.dataset.selectedFighter == fighter.id) {
+                                option.selected = true;
+
+                                if (select === redCornerSelect) {
+                                    redCartelSpan.textContent = fighter.record.cartel;
+                                }
+                                if (select === blueCornerSelect) {
+                                    blueCartelSpan.textContent = fighter.record.cartel;
+                                }
+                            }
+                        }
+                    );
+                }
+
+                addCategoryPickerEvent(categoryPicker);
+            });
+
+            const initialRemoveButtons = document.querySelectorAll('.btn-remove');
+            Array.from(initialRemoveButtons).forEach(addRemoveButtonEvent);
+
+            addItemButton.addEventListener('click', function () {
+                const sortableItems = sortableContainer.querySelectorAll('.sortable-item');
+                if (sortableItems.length >= 8) {
+                    alert('Maximum fights allowed');
+                    return
+                }
+
+                const lastItem = sortableItems[sortableItems.length - 1];
+                if (!lastItem) {
+                    alert('There\'s no items to clone!');
+                    return;
+                }
+
+                const newItem = lastItem.cloneNode(true);
+
+                const selects = newItem.querySelectorAll('.select-corner');
+                selects.forEach(select => {
+                    select.selectedIndex = 0;
+                });
+
+                const clonedButtons = newItem.querySelectorAll('#add-item');
+                clonedButtons.forEach(button => button.remove());
+
+                sortableContainer.insertBefore(newItem, addItemButton);
+
+                const newCategoryPicker = newItem.querySelector('.category-picker');
+                if (newCategoryPicker) {
+                    addCategoryPickerEvent(newCategoryPicker);
+                }
+
+                const newRemoveButton = newItem.querySelector('.btn-remove');
+                if (newRemoveButton) {
+                    addRemoveButtonEvent(newRemoveButton);
+                }
+
+                const newRedGlove = newItem.querySelector('.red-glove img');
+                const newBlueGlove = newItem.querySelector('.blue-glove img');
+                const newBelt = newItem.querySelector('.belt img');
+                addGloveEvent(newRedGlove, 'red');
+                addGloveEvent(newBlueGlove, 'blue');
+                addBeltEvent(newBelt);
+            });
+        });
+
+        function fetchAndPopulateFighters(url, redCornerSelect, blueCornerSelect, redCartelSpan, blueCartelSpan, selectedFighterCallback) {
+            axios.get(url)
+                .then(function (response) {
+                    const fighters = response.data;
+
+                    [redCornerSelect, blueCornerSelect].forEach(select => {
+                        select.innerHTML = '';
+
+                        const placeholderOption = document.createElement('option');
+                        placeholderOption.textContent = 'Select fighter';
+                        placeholderOption.selected = true;
+                        placeholderOption.disabled = true;
+                        select.appendChild(placeholderOption);
+
+                        fighters.forEach(fighter => {
+                            const option = document.createElement('option');
+                            option.value = fighter.id;
+                            option.textContent = fighter.name;
+                            option.dataset.cartel = fighter.record.cartel;
+
+                            if (selectedFighterCallback) {
+                                selectedFighterCallback(option, select, fighter);
+                            } else {
+                                blueCartelSpan.textContent = "";
+                                redCartelSpan.textContent = "";
+                            }
+
+                            select.appendChild(option);
+                        });
+
+                        select.disabled = false;
+                    });
+
+                    if (redCornerSelect.dataset.selectedFighter) {
+                        const selectedOption = Array.from(redCornerSelect.options).find(option => option.value == redCornerSelect.dataset.selectedFighter);
+                        if (selectedOption) redCartelSpan.textContent = selectedOption.dataset.cartel;
+                    }
+
+                    if (blueCornerSelect.dataset.selectedFighter) {
+                        const selectedOption = Array.from(blueCornerSelect.options).find(option => option.value == blueCornerSelect.dataset.selectedFighter);
+                        if (selectedOption) blueCartelSpan.textContent = selectedOption.dataset.cartel;
+                    }
+
+                    updateCartelInfo(redCornerSelect, redCartelSpan);
+                    updateCartelInfo(blueCornerSelect, blueCartelSpan);
+                })
+                .catch(function (error) {
+                    console.error('Erro ao buscar lutadores:', error);
+                });
+        }
+
+        function updateCartelInfo(selectElement, cartelSpan) {
+            selectElement.addEventListener('change', function () {
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption && selectedOption.dataset.cartel) {
+                    cartelSpan.textContent = selectedOption.dataset.cartel;
+                } else {
+                    cartelSpan.textContent = '';
+                }
+            });
+        }
+
+    </script>
+{% endblock %}
+

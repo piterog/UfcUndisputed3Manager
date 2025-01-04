@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block body%}
+    <div class="container-fluid">
+        <table class="table mt-3 pt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Event</th>
+                    <th scope="col">Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in events %}
+                    <tr>
+                        <th scope="row">{{ item.id }}</th>
+                        <td>{{ item.description }}</td>
+                        <td>{{ item.created_at | datetime }}</td>
+                        <td>
+                            {% if not item.started %}
+                                <a class="btn btn-info" href="{{ url_for("event_build", event_id=item.id) }}">Build Card</a>
+                            {% endif %}
+                            <a class="btn btn-warning" href="{{ url_for("event_fights", event_id=item.id) }}">Fights</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

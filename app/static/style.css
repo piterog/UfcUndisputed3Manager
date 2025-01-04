@@ -1,0 +1,186 @@
+.sortable-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: #f9f9f9;
+    border-radius: 5px;
+    cursor: grab;
+}
+
+.schedule-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: #f9f9f9;
+    border-radius: 5px;
+    cursor: auto;
+    position: relative;
+    width: 70%;
+}
+
+.sortable-item:active {
+    cursor: grabbing;
+}
+
+.form-floating .red{
+    color: #973737;
+    font-weight: bold;
+}
+
+.form-floating .blue{
+    color: #376497;
+    font-weight: bold;
+}
+
+.btn-remove {
+    background-color: red;
+    color: white;
+    border: none;
+    width: 30px;
+    height: 100%;
+    position: absolute;
+    right: -30px;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.btn-save-fight {
+    background-color: green;
+    color: white;
+    border: none;
+    width: 30px;
+    height: 100%;
+    position: absolute;
+    right: -378px;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 100;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+}
+
+.result-area {
+    background-color: #bababa;
+    color: white;
+    border: none;
+    width: 350px;
+    height: 100%;
+    position: absolute;
+    right: -337px;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: auto;
+    z-index: 10;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.result-area .btn-group {
+    border: 1px solid #fff;
+}
+
+.result-area .no-border {
+    border: 0;
+}
+
+.result-area .btn-outline-danger {
+    color: #973737;
+    --bs-btn-active-bg: #973737 !important;
+}
+
+.result-area .btn-outline-danger:checked {
+    color: #fff;
+    background-color: #973737 !important;
+}
+
+.result-area .btn-outline-primary {
+    color: #376497;
+    --bs-btn-active-bg: #376497 !important;
+}
+
+.result-area .btn-outline-primary:checked {
+    color: #fff;
+    background-color: #376497 !important;
+}
+
+.sortable-item {
+    position: relative;
+}
+
+.vs {
+    color: #000;
+    margin-left: 10px;
+}
+
+.glove img{
+    width: 30px;
+    opacity: 0.1;
+    cursor: pointer;
+}
+
+.belt img {
+    width: 38px;
+    opacity: 0.1;
+    cursor: pointer;
+}
+
+.cartel-info {
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.cartel-info img{
+    width: 16px;
+}
+
+.fight-option {
+    margin-top: -20px;
+}
+
+.cartel-red {
+    color: #973737;
+}
+
+.cartel-blue {
+    color: #376497;
+}
+
+.red-btn {
+    border-color: #973737;
+    color: #973737;
+    border-radius: 25px;
+}
+
+.no-opacity {
+    opacity: 1 !important;
+}
+
+.no-cursor {
+    cursor: auto !important;
+}
+
+.round-select {
+    scrollbar-width: thin;
+    width: 100%;
+    border-radius: 5px;
+    outline: none;
+    border: 1px solid #dee2e6;
+}
+
+.strikethrough-text {
+    text-decoration: line-through;
+}
