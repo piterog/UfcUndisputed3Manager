@@ -8,6 +8,7 @@ from app.services.events_service import (
 from app.services.fighters_service import get_all_fighters
 from app.services.fights_service import get_fights_from_event, remove_fights_by_event, create_fight, has_event_started
 from app.forms.event import EventForm
+from app.services.rewards_service import add_rewards
 
 
 def index():
@@ -31,6 +32,33 @@ def event_fights(event_id: int):
     fights = get_fights_from_event(event_id)
     event = get_event_details(event_id)
     return render_template('event_fights.html', fights=fights, event=event)
+
+def event_awards(event_id: int):
+    fights = get_fights_from_event(event_id)
+    event = get_event_details(event_id)
+    kos = []
+    submissions = []
+
+    for fight in fights:
+        if fight.method == 'ko' or fight.method == 'tko':
+            kos.append(fight)
+
+        if fight.method == 'submission':
+            submissions.append(fight)
+
+    return render_template('event_awards.html', fights=fights, event=event, kos=kos, submissions=submissions)
+
+def event_awards_save(event_id: int):
+    rewards = [
+        {'best_fight': request.form.get('best-fight')},
+        {'best_performance': request.form.get('best-performance')},
+        {'best_submission': request.form.get('best-submission')},
+        {'best_ko': request.form.get('best-ko')},
+    ]
+
+    add_rewards(rewards)
+
+    return redirect(url_for('events'))
 
 def create_event():
     form = EventForm()

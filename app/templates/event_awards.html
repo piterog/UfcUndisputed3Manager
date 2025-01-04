@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block body%}
+    <div class="component mt-2 mx-5 pt-2 px-5">
+        <div class="text-center">
+            <h2>{{ event.description }}</h2>
+        </div>
+        <form action="{{ url_for('event_awards', event_id=event.id) }}" method="POST">
+            <div class="form-floating">
+                <select name="best-fight" class="form-select select-corner" required>
+                    {% for fight in fights %}
+                        <option value="{{ fight.id }}">
+                            {{ fight.red_corner.name }} vs {{ fight.blue_corner.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <label for="floatingSelect">Fight of the Night</label>
+            </div>
+
+            <div class="form-floating mt-5">
+                <select name="best-submission" class="form-select select-corner">
+                    {% for fight in submissions %}
+                        <option value="{{ fight.id }}">
+                            {{ fight.winner.name }} ~ [{{ fight.red_corner.name }} vs {{ fight.blue_corner.name }}]
+                        </option>
+                    {% endfor %}
+                </select>
+                <label for="floatingSelect">Submission of the Night</label>
+            </div>
+
+            <div class="form-floating mt-5">
+                <select name="best-ko" class="form-select select-corner">
+                    {% for fight in kos %}
+                        <option value="{{ fight.id }}">
+                            {{ fight.winner.name }} ~ [{{ fight.red_corner.name }} vs {{ fight.blue_corner.name }}]
+                        </option>
+                    {% endfor %}
+                </select>
+                <label for="floatingSelect">Knockout of the Night</label>
+            </div>
+
+            <div class="form-floating mt-5">
+                <select name="best-performance" class="form-select select-corner" required>
+                    {% for fight in fights %}
+                        <option value="{{ fight.id }}">
+                            {{ fight.winner.name }} ~ [{{ fight.red_corner.name }} vs {{ fight.blue_corner.name }}]
+                        </option>
+                    {% endfor %}
+                </select>
+                <label for="floatingSelect">Performance of the Night</label>
+            </div>
+
+            <input type="submit" class="btn btn-success mt-3 w-100" value="Submit awards">
+        </form>
+
+{% endblock %}
+

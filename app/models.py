@@ -60,3 +60,14 @@ class Fight(db.Model):
     loser: Mapped[Fighter] = db.relationship("Fighter", foreign_keys=[loser_id], backref="fights_as_loser")
     category: Mapped[Category] = db.relationship("Category", backref="fights")
     event: Mapped[Event] = db.relationship("Event", backref="fights")
+
+class Reward(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    type: Mapped[str] = mapped_column(nullable=False)
+    fighter_id: Mapped[int] = mapped_column(Integer, ForeignKey('fighter.id'), nullable=False)
+    fight_id: Mapped[int] = mapped_column(Integer, ForeignKey('fight.id'), nullable=False)
+    event_id: Mapped[int] = mapped_column(Integer, ForeignKey('event.id'), nullable=False)
+
+    event: Mapped[Event] = db.relationship("Event", backref="rewards")
+    fight: Mapped[Event] = db.relationship("Fight", backref="rewards")
+    fighter: Mapped[Event] = db.relationship("Fighter", backref="rewards")

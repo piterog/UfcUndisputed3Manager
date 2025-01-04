@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import List, Any, Union
 from app.db_base import update_in_db, save_to_db
 from app.models import Fight, CategoryFighter
-import app
 
 def get_fight(fight_id: int) -> Fight:
     return Fight.query.filter_by(id=fight_id).first()

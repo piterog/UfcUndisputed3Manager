@@ -48,8 +48,7 @@ def update_loser_ranking(fighter: Fighter, category_id: int, ranking_points: int
 
     update_ranking(fighter.id, category_id, ranking_points)
 
-# def update_fighters_data(fight_id: int) -> None:
-def update_fighters_data(fight_id: int):
+def update_fighters_data(fight_id: int) -> None:
     fight = get_fight(fight_id)
     red_fighter = fight.red_corner
     blue_fighter = fight.blue_corner
@@ -62,7 +61,6 @@ def update_fighters_data(fight_id: int):
 
         add_victory(winner)
         add_defeat(loser)
-        update_in_db(Fighter, {'id': loser.id}, {'defeats': loser.defeats + 1})
 
         fight_points = calculate_ranking_points(fight)
 

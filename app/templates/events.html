@@ -20,6 +20,8 @@
                         <td>
                             {% if not item.started %}
                                 <a class="btn btn-info" href="{{ url_for("event_build", event_id=item.id) }}">Build Card</a>
+                            {% else %}
+                                <a class="btn btn-secondary" href="{{ url_for("event_awards", event_id=item.id) }}">Awards</a>
                             {% endif %}
                             <a class="btn btn-warning" href="{{ url_for("event_fights", event_id=item.id) }}">Fights</a>
                         </td>
