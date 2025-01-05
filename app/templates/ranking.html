@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block body%}
+    <div class="container-fluid mt-3">
+       <div class="row">
+            {% for category in categories %}
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="card-header text-center fw-bold bg-dark text-white">
+                            {{ category.category }}
+                        </div>
+                        <table class="table table-striped">
+                            {% for fighter in category.fighters %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>
+                                        <a href="#" class="fighter-link" data-fighter-id="{{ fighter.id }}" data-bs-toggle="modal" data-bs-target="#fighterModal">
+                                            {{ fighter.name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ fighter.record.cartel }}</td>
+                                    <td>{{ fighter.ranking }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="modal fade" id="fighterModal" tabindex="-1" aria-labelledby="fighterModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="fighterModalLabel">Fighter Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="fighterModalBody">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fighterLinks = document.querySelectorAll('.fighter-link');
+
+            fighterLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const fighterId = this.getAttribute('data-fighter-id');
+
+                    axios.get(`fighter/${fighterId}/details`)
+                        .then(response => {
+                            const data = response.data;
+
+                            let fights = '';
+                            for (const [key, value] of Object.entries(data.fights)) {
+                                let color = value.result === 'W' ? 'table-success' : 'table-danger';
+                                fights += `
+                                    <tr class="${color}">
+                                        <td>${value.result}</td>
+                                        <td>${value.opponent_name}</td>
+                                        <td>${value.category_short}</td>
+                                        <td>${value.event_description.toUpperCase()}</td>
+                                        <td>${value.method.toUpperCase()}</td>
+                                        <td>${value.time} / ${value.round}</td>
+                                    </tr>
+                                `
+                            }
+
+                            document.getElementById('fighterModalBody').innerHTML = `
+                                <div class="fighter-details">
+                                    <h4>${data.fighter.name} <small>[${data.fighter.record.cartel} <kbd>${data.fighter.record.only_manager.cartel}</kbd>]</small></h4>
+                                    <div class="info">
+                                        <p><span>Age:</span> ${data.fighter.age}</p>
+                                        <p><span>From:</span> ${data.fighter.from}</p>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-6">
+                                            <h5>WINS</h5>
+                                            <span>${data.fighter.record.only_manager.victories}</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <h5>LOSSES</h5>
+                                            <span>${data.fighter.record.only_manager.defeats}</span>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <h5># Fight History</h5>
+                                    <div class="row">
+                                        <div class="container">
+                                            <table class="table table-sm">
+                                                <thead class="">
+                                                    <tr>
+                                                        <th scope="col"></th>
+                                                        <th scope="col">Opponent</th>
+                                                        <th scope="col">Category</th>
+                                                        <th scope="col">Event</th>
+                                                        <th scope="col">Method</th>
+                                                        <th scope="col">Time / Round</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${fights}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        })
+                        .catch(error => {
+                            document.getElementById('fighterModalBody').innerHTML = `
+                                <div class="alert alert-danger">
+                                    Erro ao carregar os dados do lutador.
+                                </div>
+                            `;
+                            console.error('Erro:', error);
+                        });
+                });
+            });
+        });
+    </script>
+{% endblock %}

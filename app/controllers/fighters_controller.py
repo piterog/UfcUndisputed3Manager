@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify
-from app.services.fighters_service import get_all_fighters, get_by_category, format_record
+from app.services.fighters_service import get_all_fighters, get_by_category, format_record, get_fighter_details
 
 
 def index():
@@ -20,3 +20,6 @@ def fighters_by_category(category_id: int):
         obj.append(fighter)
 
     return jsonify(obj)
+
+def details(fighter_id: int):
+    return jsonify(get_fighter_details(fighter_id))

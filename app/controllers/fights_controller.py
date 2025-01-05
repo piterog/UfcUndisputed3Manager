@@ -1,9 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify
-
 from app.services.events_service import mark_event_completed
 from app.services.fighters_service import update_fighters_data
-from app.services.fights_service import get_fight, format_fight_data, get_fight_winner_id, get_fight_loser_id, \
-    update_fight_result, is_event_completed
+from app.services.fights_service import get_fight, format_fight_data, update_fight_result, is_event_completed
 
 
 def fight_save_results(event_id, fight_id):
@@ -27,9 +25,3 @@ def fight_save_results(event_id, fight_id):
         return str(e), 500
 
     return redirect(url_for('event_fights', event_id=event_id))
-
-
-def teste():
-    fight_id = 2
-    return update_fighters_data(fight_id)
-    return "A"

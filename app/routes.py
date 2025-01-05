@@ -4,6 +4,7 @@ def register_routes(app):
     app.add_url_rule('/home', 'home', home_controller.index, methods=['GET'])
     app.add_url_rule('/ranking', 'ranking', home_controller.ranking, methods=['GET'])
     app.add_url_rule('/fighters', 'fighters', fighters_controller.index, methods=['GET'])
+    app.add_url_rule('/fighter/<int:fighter_id>/details', 'fighters_details', fighters_controller.details, methods=['GET'])
     app.add_url_rule('/events', 'events', events_controller.index, methods=['GET'])
     app.add_url_rule('/event', 'event', events_controller.create_event, methods=['GET', 'POST'])
     app.add_url_rule('/event/<int:event_id>', 'event_build', events_controller.event_build)
