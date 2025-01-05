@@ -1,3 +1,5 @@
+from typing import List
+
 from app import db
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey, Integer, Boolean, DateTime
@@ -15,22 +17,25 @@ class Fighter(db.Model):
     no_contests: Mapped[int] = mapped_column(nullable=True, default=0)
     image: Mapped[str] = mapped_column(nullable=True)
 
+    categoryfighters: Mapped[List["CategoryFighter"]] = db.relationship("CategoryFighter", back_populates="fighter")
+
 class Category(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     description: Mapped[str] = mapped_column(unique=True)
     champion_id: Mapped[int] = mapped_column(Integer, ForeignKey('fighter.id'), nullable=False)
-    
-    fighter: Mapped[Fighter] = db.relationship("Fighter", backref="categories")
-    
+
+    champion: Mapped[Fighter] = db.relationship("Fighter", foreign_keys=[champion_id])
+    categoryfighters: Mapped[List["CategoryFighter"]] = db.relationship("CategoryFighter", back_populates="category")
+
 class CategoryFighter(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     fighter_id: Mapped[int] = mapped_column(Integer, ForeignKey('fighter.id'), nullable=False)
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey('category.id'), nullable=False)
     ranking: Mapped[int] = mapped_column(Integer)
-    
-    fighter: Mapped[Fighter] = db.relationship("Fighter", backref="categoryfighters")
-    category: Mapped[Category] = db.relationship("Category", backref="categoryfighters")
-    
+
+    fighter: Mapped[Fighter] = db.relationship("Fighter", back_populates="categoryfighters")
+    category: Mapped[Category] = db.relationship("Category", back_populates="categoryfighters")
+
 class Event(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     description: Mapped[str] = mapped_column(unique=True)
@@ -69,5 +74,16 @@ class Reward(db.Model):
     event_id: Mapped[int] = mapped_column(Integer, ForeignKey('event.id'), nullable=False)
 
     event: Mapped[Event] = db.relationship("Event", backref="rewards")
-    fight: Mapped[Event] = db.relationship("Fight", backref="rewards")
-    fighter: Mapped[Event] = db.relationship("Fighter", backref="rewards")
+    fight: Mapped[Fight] = db.relationship("Fight", backref="rewards")
+    fighter: Mapped[Fighter] = db.relationship("Fighter", backref="rewards")
+
+class RankingPointsHistoric(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    points: Mapped[int] = mapped_column(nullable=False)
+    model_type: Mapped[str] = mapped_column(nullable=False)
+    model_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    fighter_id: Mapped[int] = mapped_column(Integer, ForeignKey('fighter.id'), nullable=False)
+    category_id: Mapped[int] = mapped_column(Integer, ForeignKey('category.id'), nullable=False)
+
+    fighter: Mapped[Fighter] = db.relationship("Fighter", backref="ranking_historic")
+    category: Mapped[Category] = db.relationship("Category", backref="ranking_historic")

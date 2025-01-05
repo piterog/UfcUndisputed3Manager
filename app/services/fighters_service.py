@@ -4,6 +4,7 @@ from app.db_base import update_in_db
 from app.services.categories_service import set_new_champion
 from app.services.category_fighters_service import get_fighter_ranking, update_ranking
 from app.services.fights_service import get_fight, is_match_drawn, calculate_ranking_points
+from app.services.ranking_historics_service import add_historic
 
 
 def get_all_fighters():
@@ -12,9 +13,14 @@ def get_all_fighters():
 def get_fighter(fighter_id) -> Optional[Fighter]:
     return Fighter.query.filter_by(id=fighter_id).first()
 
-def get_by_category(category_id: int):
-    return Fighter.query.join(CategoryFighter, Fighter.id == CategoryFighter.fighter_id).filter(
-        CategoryFighter.category_id == category_id).all()
+def get_by_category(category_id: int, sort_by_ranking: bool = False) -> Optional[Fighter]:
+    fighters = Fighter.query.join(CategoryFighter, Fighter.id == CategoryFighter.fighter_id).filter(
+        CategoryFighter.category_id == category_id)
+
+    if sort_by_ranking:
+        fighters = fighters.order_by(CategoryFighter.ranking.desc())
+
+    return fighters.all()
 
 def add_victory(fighter: Fighter) -> None:
     update_in_db(Fighter, {'id': fighter.id}, {'victories': fighter.victories + 1})
@@ -30,13 +36,9 @@ def update_winner_ranking(fighter: Fighter, category_id: int, is_belt_dispute: b
     actual_ranking = get_fighter_ranking(fighter.id, category_id)
 
     points = ranking_points
-
     points += actual_ranking
-    if points > 999:
-        points = 999
 
     if is_belt_dispute:
-        points = 1000
         set_new_champion(category_id, fighter.id)
 
     update_ranking(fighter.id, category_id, points)
@@ -63,6 +65,9 @@ def update_fighters_data(fight_id: int) -> None:
         add_defeat(loser)
 
         fight_points = calculate_ranking_points(fight)
+
+        add_historic(fight_points['winner'], type(fight).__name__, fight.id, winner.id, fight.category_id)
+        add_historic(fight_points['loser'], type(fight).__name__, fight.id, loser.id, fight.category_id)
 
         is_belt_dispute = fight.belt_dispute
         update_winner_ranking(winner, fight.category_id, is_belt_dispute, fight_points['winner'])

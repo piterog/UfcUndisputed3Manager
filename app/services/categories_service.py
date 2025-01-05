@@ -1,6 +1,9 @@
 from app.db_base import update_in_db
 from app.models import Category
 
+def get_category(category_id: int):
+    return Category.query.get(category_id)
+
 def get_all_categories():
     return Category.query.all()
 
