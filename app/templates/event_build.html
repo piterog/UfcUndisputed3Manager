@@ -12,8 +12,8 @@
         <div class="text-center">
             <h2>{{ event.description }}</h2>
         </div>
-        <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
-            <div id="sortable-container">
+        <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST" >
+            <div id="sortable-container" data-bs-dismiss="offcanvas">
                 {% for fight in fights %}
                     <div class="sortable-item" data-control="{{ fight.control }}">
                     <button type="button" class="btn-remove" aria-label="Remove">×</button>
@@ -74,7 +74,7 @@
                             <div class="col-sm-12 d-flex align-items-center justify-content-center">
                                 <div class="col-sm-4 mt-2 pt-2">
                                     <select name="categories[]" class="form-select form-select-sm text-center category-picker" required>
-                                        <option>Select category</option>
+                                        <option value="">Select category</option>
                                         {% for category in categories %}
                                             <option value="{{ category.id }}" {% if category.id == fight.category_id %}selected{% endif %}>
                                                 {{ category.description }}
@@ -87,72 +87,86 @@
                     </div>
                 </div>
                 {% else %}
+                    {% for _ in range(1,9) %}
                     <div class="sortable-item">
-                    <button type="button" class="btn-remove" aria-label="Remove">×</button>
-                    <div class="container-fluid">
-                        <div class="row d-flex align-items-center justify-content-center align-items-center mt-3 pt-3">
-                            <div class="col-sm-1 text-end">
-                                <div class="glove red-glove">
-                                    <img src="{{ url_for('static', filename="default.svg") }}" alt="red-glove">
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-floating">
-                                    <select name="red-fighters[]" class="form-select select-corner" required>
-                                    </select>
-                                    <label class="red" for="floatingSelect">Red Corner</label>
-                                    <div class="cartel-info float-start mt-1">
-                                        <span class="cartel-red"></span>
-                                        <img src="{{ url_for('static', filename="info.svg") }}" alt="">
+                        <button type="button" class="btn-remove" aria-label="Remove">×</button>
+                        <div class="container-fluid">
+                            <div class="row d-flex align-items-center justify-content-center align-items-center mt-3 pt-3">
+                                <div class="col-sm-1 text-end">
+                                    <div class="glove red-glove">
+                                        <img src="{{ url_for('static', filename="default.svg") }}" alt="red-glove">
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-auto fight-option">
-                                <div class="belt">
-                                    <img src="{{ url_for('static', filename="belt.svg") }}" alt="belt">
-                                </div>
-                                <input type="hidden" name="belt[]" value="">
-                                <input type="hidden" name="control[]" value="">
-                                <div class="mt-1">
-                                    <span class="vs">vs</span>
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-floating">
-                                    <select name="blue-fighters[]" class="form-select select-corner" required>
-                                    </select>
-                                    <label class="blue" for="floatingSelect">Blue Corner</label>
-                                    <div class="cartel-info float-end mt-1">
-                                        <span class="cartel-blue"></span>
-                                        <img src="{{ url_for('static', filename="info.svg") }}" alt="">
+                                <div class="col-sm-4">
+                                    <div class="form-floating">
+                                        <select name="red-fighters[]" class="form-select select-corner" data-row-id="{{ _ }}" required>
+                                        </select>
+                                        <label class="red" for="floatingSelect">Red Corner</label>
+                                        <div class="cartel-info float-start mt-1">
+                                            <span class="cartel-red"></span>
+                                            <img src="{{ url_for('static', filename="info.svg") }}" alt="">
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-1">
-                                <div class="glove blue-glove">
-                                    <img src="{{ url_for('static', filename="default.svg") }}" alt="blue-glove">
+                                <div class="col-auto fight-option">
+                                    <div class="belt">
+                                        <img src="{{ url_for('static', filename="belt.svg") }}" alt="belt">
+                                    </div>
+                                    <input type="hidden" name="belt[]" value="">
+                                    <input type="hidden" name="control[]" value="">
+                                    <div class="mt-1">
+                                        <span class="vs">vs</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-12 d-flex align-items-center justify-content-center">
-                                <div class="col-sm-4 mt-2 pt-2">
-                                    <select name="categories[]" class="form-select form-select-sm text-center category-picker" required>
-                                        <option>Select category</option>
-                                        {% for category in categories %}
-                                            <option value="{{ category.id }}">
-                                                {{ category.description }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
+                                <div class="col-sm-4">
+                                    <div class="form-floating">
+                                        <select name="blue-fighters[]" class="form-select select-corner" data-row-id="{{ _ }}" required>
+                                        </select>
+                                        <label class="blue" for="floatingSelect">Blue Corner</label>
+                                        <div class="cartel-info float-end mt-1">
+                                            <span class="cartel-blue"></span>
+                                            <img src="{{ url_for('static', filename="info.svg") }}" alt="">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-1">
+                                    <div class="glove blue-glove">
+                                        <img src="{{ url_for('static', filename="default.svg") }}" alt="blue-glove">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 d-flex align-items-center justify-content-center">
+                                    <div class="col-sm-4 mt-2 pt-2">
+                                        <select name="categories[]" class="form-select form-select-sm text-center category-picker" required>
+                                            <option>Select category</option>
+                                            {% for category in categories %}
+                                                <option value="{{ category.id }}">
+                                                    {{ category.description }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="ranking-icon mt-3">
+                                        <img src="{{ url_for('static', filename="ranking.svg") }}" class="ranking-icon-btn" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    {% endfor %}
                 {% endfor %}
                 <span id="add-item" class="btn btn-primary mt-3 w-100">Add fight</span>
             </div>
             <input type="submit" id="schedule-event" class="btn btn-success mt-3 w-100" value="Schedule Event">
         </form>
+    </div>
+
+    <div class="offcanvas offcanvas-end text-dark" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+        <div class="offcanvas-header">
+            <h4 class="offcanvas-title fw-bold" id="offcanvasTitle"></h4>
+        </div>
+        <div class="offcanvas-body" id="offcanvas-body">
+
+        </div>
     </div>
 
     <script>
@@ -182,6 +196,10 @@
                     const blueCornerSelect = parentDiv.querySelector('.blue').closest('.form-floating').querySelector('select');
                     const redCartelSpan = parentDiv.querySelector('.cartel-red').closest('.form-floating').querySelector('span');
                     const blueCartelSpan = parentDiv.querySelector('.cartel-blue').closest('.form-floating').querySelector('span');
+                    const btnOffCanvasRanking = parentDiv.querySelector('.ranking-icon-btn').closest('.ranking-icon').querySelector('img');
+
+                    btnOffCanvasRanking.dataset.categoryId = this.value
+                    btnOffCanvasRanking.dataset.rowId = redCornerSelect.getAttribute('data-row-id')
 
                     if (redCornerSelect && blueCornerSelect) {
                         const route = `/fighters/${this.value}/category`;
@@ -201,7 +219,7 @@
             Array.from(initialCategoryPickers).forEach(categoryPicker => {
                 const selectedCategory = categoryPicker.value;
 
-                if (selectedCategory) {
+                if (selectedCategory !== "Select category") {
                     const parentDiv = categoryPicker.closest('.row');
                     const redCornerSelect = parentDiv.querySelector('.red').closest('.form-floating').querySelector('select');
                     const blueCornerSelect = parentDiv.querySelector('.blue').closest('.form-floating').querySelector('select');
@@ -340,6 +358,73 @@
                 }
             });
         }
+
+        function setFighter(fighterId, selectedRow) {
+            const selectsRedSide = document.querySelectorAll(`select[name="red-fighters[]"][data-row-id="${selectedRow}"]`);
+            const selectsBlueSide = document.querySelectorAll(`select[name="blue-fighters[]"][data-row-id="${selectedRow}"]`);
+
+            const emptyValue = "Select fighter"
+
+            if (selectsRedSide[0].value === emptyValue) {
+                selectsRedSide[0].value = fighterId
+            } else if (selectsBlueSide[0].value === emptyValue) {
+                selectsBlueSide[0].value = fighterId
+            } else if (selectsRedSide[0].value !== emptyValue && selectsBlueSide[0].value !== emptyValue) {
+                selectsRedSide[0].value = fighterId
+                selectsBlueSide[0].value = emptyValue
+            }
+        }
+
+        const fighterLinks = document.querySelectorAll('.ranking-icon-btn');
+
+        fighterLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const categoryId = this.getAttribute('data-category-id');
+                const selectedRow = this.getAttribute('data-row-id')
+
+                axios.get(`/ranking/${categoryId}/category`)
+                    .then(response => {
+                            const data = response.data;
+                            let fighters = '';
+                            for (const [key, value] of Object.entries(data[0].fighters)) {
+                                let index = parseInt(key) + 1
+                                fighters += `
+                                    <tr class="fighter-row" onclick="setFighter(${value.id}, ${selectedRow})">
+                                        <td>#${index}</td>
+                                        <td><small>${value.name}</small></td>
+                                        <td><small>${value.record.cartel}</small></td>
+                                        <td class="text-center"><small>${value.ranking}</small></td>
+                                    </tr>
+                                `
+                            }
+
+                            document.getElementById('offcanvasTitle').innerHTML = `${data[0].category}`
+                            document.getElementById('offcanvas-body').innerHTML = `
+                                <div class="">
+                                    <div class="container-fluid">
+                                        <table class="table table-sm">
+                                            <thead class="">
+                                                <tr>
+                                                    <th scope="col"></th>
+                                                    <th scope="col">Fighter</th>
+                                                    <th scope="col">Record</th>
+                                                    <th scope="col">Ranking</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${fighters}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            `;
+                        })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                    })
+            })
+        });
 
     </script>
 {% endblock %}

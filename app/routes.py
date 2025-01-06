@@ -1,8 +1,11 @@
-from app.controllers import home_controller, fights_controller, fighters_controller, events_controller
+from app.controllers import home_controller, fights_controller, fighters_controller, events_controller, \
+    categories_controller
+
 
 def register_routes(app):
     app.add_url_rule('/home', 'home', home_controller.index, methods=['GET'])
     app.add_url_rule('/ranking', 'ranking', home_controller.ranking, methods=['GET'])
+    app.add_url_rule('/ranking/<int:category_id>/category', 'ranking_by_category', categories_controller.ranking_by_category, methods=['GET'])
     app.add_url_rule('/fighters', 'fighters', fighters_controller.index, methods=['GET'])
     app.add_url_rule('/fighter/<int:fighter_id>/details', 'fighters_details', fighters_controller.details, methods=['GET'])
     app.add_url_rule('/events', 'events', events_controller.index, methods=['GET'])

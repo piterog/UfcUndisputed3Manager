@@ -28,3 +28,34 @@ def format_short_category(category_description: str) -> str:
         return "LHW"
     elif category_description == "Heavyweight":
         return "HW"
+
+def get_ranking(category_id: int = None) -> list:
+    from app.services.category_fighters_service import get_fighter_ranking
+    from app.services.fighters_service import get_by_category, format_record
+
+    list_fighters = []
+    list_category = []
+    category_range = range(1, 8)
+
+    if category_id:
+        category_range = [category_id]
+
+    for category_id in category_range:
+        fighters = get_by_category(category_id, sort_by_ranking=True)
+        category = get_category(category_id)
+        for fighter in fighters:
+            list_fighters.append({
+                'id': fighter.id,
+                'name': fighter.name,
+                'record': format_record(fighter),
+                'ranking': get_fighter_ranking(fighter.id, category_id)
+            })
+
+        list_category.append({
+            'category': category.description,
+            'fighters': list_fighters
+        })
+
+        list_fighters = []
+
+    return list_category

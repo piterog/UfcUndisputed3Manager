@@ -184,3 +184,24 @@
 .strikethrough-text {
     text-decoration: line-through;
 }
+
+.fighter-details small {
+    font-size: 12px;
+}
+
+.fighter-details p {
+    margin-bottom: 0;
+}
+
+.ranking-icon {
+    margin-left: 5px;
+}
+.ranking-icon img {
+    width: 22px;
+    opacity: 0.1;
+    cursor: pointer;
+}
+
+.fighter-row {
+    cursor: pointer;
+}
