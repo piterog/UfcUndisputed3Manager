@@ -13,7 +13,7 @@
             <h2>{{ event.description }}</h2>
         </div>
         <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST" >
-            <div id="sortable-container" data-bs-dismiss="offcanvas">
+            <div id="sortable-container">
                 {% for fight in fights %}
                     <div class="sortable-item" data-control="{{ fight.control }}">
                     <button type="button" class="btn-remove" aria-label="Remove">×</button>
@@ -89,6 +89,9 @@
                 {% else %}
                     {% for _ in range(1,9) %}
                     <div class="sortable-item">
+                        <div class="item-title text-dark fw-bold fs-6 fst-italic">
+                            <small>#{{ _ }}</small>
+                        </div>
                         <button type="button" class="btn-remove" aria-label="Remove">×</button>
                         <div class="container-fluid">
                             <div class="row d-flex align-items-center justify-content-center align-items-center mt-3 pt-3">
@@ -160,7 +163,7 @@
         </form>
     </div>
 
-    <div class="offcanvas offcanvas-end text-dark" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+    <div class="offcanvas offcanvas-end text-dark" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" data-bs-dismiss="offcanvas" aria-labelledby="offcanvasScrollingLabel">
         <div class="offcanvas-header">
             <h4 class="offcanvas-title fw-bold" id="offcanvasTitle"></h4>
         </div>
@@ -367,11 +370,15 @@
 
             if (selectsRedSide[0].value === emptyValue) {
                 selectsRedSide[0].value = fighterId
+                selectsRedSide[0].dispatchEvent(new Event('change'));
             } else if (selectsBlueSide[0].value === emptyValue) {
                 selectsBlueSide[0].value = fighterId
+                selectsBlueSide[0].dispatchEvent(new Event('change'));
             } else if (selectsRedSide[0].value !== emptyValue && selectsBlueSide[0].value !== emptyValue) {
                 selectsRedSide[0].value = fighterId
+                selectsRedSide[0].dispatchEvent(new Event('change'));
                 selectsBlueSide[0].value = emptyValue
+                selectsBlueSide[0].dispatchEvent(new Event('change'));
             }
         }
 

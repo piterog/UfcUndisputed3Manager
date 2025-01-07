@@ -9,6 +9,9 @@
             {% for fight in fights %}
                 <form action="{{ url_for('fight_save_results', event_id=fight.event_id, fight_id=fight.id) }}" method="POST">
                     <div class="schedule-item">
+                        <div class="item-title fw-bold fs-6 fst-italic">
+                            <small>#{{ loop.index }} [{{ fight.id }}]</small>
+                        </div>
                         {% if not fight.save_fight_at %}
                             <button type="submit" class="btn-save-fight">Save</button>
                         {% endif %}
