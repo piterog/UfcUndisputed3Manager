@@ -42,3 +42,6 @@ def add_reward(type_reward: str, fighter_id: int, fight_id: int, category_id: in
     reward = save_to_db(Reward(type=type_reward, fighter_id=fighter_id, fight_id=fight_id, event_id=event_id))
     update_ranking(fighter_id, category_id, get_fighter_ranking(fighter_id, category_id) + 30)
     add_historic(30, type(reward).__name__, reward.id, fighter_id, category_id)
+
+def has_reward(event_id: int) -> bool:
+    return Reward.query.filter_by(event_id=event_id).count() > 0

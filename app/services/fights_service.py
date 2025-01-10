@@ -5,7 +5,6 @@ from app.models import Fight, CategoryFighter
 from app.services.categories_service import format_short_category
 from sqlalchemy import func
 
-
 def get_fight(fight_id: int) -> Fight:
     return Fight.query.filter_by(id=fight_id).first()
 
@@ -153,6 +152,10 @@ def is_event_completed(event_id: int) -> bool:
 def has_event_started(event_id: int) -> bool:
     return Fight.query.filter(Fight.event_id == event_id, Fight.save_fight_at.isnot(None)).count()
 
+def has_event_finished(event_id: int) -> bool:
+    from app.services.rewards_service import has_reward
+
+    return has_reward(event_id)
 
 def get_opponent_id(fight_id: int, fighter_id:int) -> int:
     fight = get_fight(fight_id)

@@ -1,12 +1,12 @@
 from typing import Optional, Dict
-from app.models import Fighter, CategoryFighter
+from app.models import Fighter, CategoryFighter, Event, Fight
 from app.db_base import update_in_db
 from app.services.categories_service import set_new_champion
 from app.services.category_fighters_service import get_fighter_ranking, update_ranking
 from app.services.fights_service import get_fight, is_match_drawn, calculate_ranking_points, get_fight_historic, \
     get_lost_or_won_fights_grouped_by_method
 from app.services.ranking_historics_service import add_historic
-
+from sqlalchemy import func, select, case
 
 def get_all_fighters():
     return Fighter.query.all()
@@ -164,3 +164,42 @@ def get_fighter_stats(fighter_id: int):
         "wins_methods": wins_methods,
         "loss_methods": loss_methods,
     }
+
+def fighters_list_inactivity():
+    from extensions import db
+
+    last_event_id = select(func.max(Event.id)).scalar_subquery()
+
+    # subquery to get the last event of every fighter
+    last_fighter_events = select(
+        Fighter.id.label('fighter_id'),
+        func.max(Event.id).label('last_event_id')
+    ).select_from(Fighter) \
+        .outerjoin(Fight, (Fighter.id == Fight.red_corner_id) | (Fighter.id == Fight.blue_corner_id)) \
+        .outerjoin(Event) \
+        .group_by(Fighter.id) \
+        .subquery()
+
+    # main query
+    query = select(
+        Fighter.id,
+        Fighter.name,
+        case(
+            # If never fight
+            (last_fighter_events.c.last_event_id == None, last_event_id),
+            # calculate diference between last event and the last event of fighter
+            else_=(last_event_id - last_fighter_events.c.last_event_id) + 1
+        ).label('events_since_last_fight')
+    ).outerjoin(
+        last_fighter_events,
+        Fighter.id == last_fighter_events.c.fighter_id
+    )
+
+    query = db.session.execute(query).all()
+
+    fighter_dic = {}
+
+    for fighter in query:
+        fighter_dic[fighter.id] = fighter.events_since_last_fight
+
+    return fighter_dic

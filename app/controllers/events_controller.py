@@ -6,7 +6,8 @@ from app.services.events_service import (
     create_new_event,
 )
 from app.services.fighters_service import get_all_fighters
-from app.services.fights_service import get_fights_from_event, remove_fights_by_event, create_fight, has_event_started
+from app.services.fights_service import get_fights_from_event, remove_fights_by_event, create_fight, has_event_started, \
+    is_event_completed, has_event_finished
 from app.forms.event import EventForm
 from app.services.rewards_service import add_rewards
 
@@ -15,6 +16,8 @@ def index():
     events = get_all_events()
     for item in events:
         item.started = has_event_started(item.id)
+        item.event_completed = is_event_completed(item.id)
+        item.has_fighters_decorated = has_event_finished(item.id)
 
     return render_template('events.html', events=events)
 
@@ -40,7 +43,7 @@ def event_awards(event_id: int):
     submissions = []
 
     for fight in fights:
-        if fight.method == 'ko' or fight.method == 'tko':
+        if fight.method == 'ko':
             kos.append(fight)
 
         if fight.method == 'submission':

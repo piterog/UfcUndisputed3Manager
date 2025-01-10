@@ -168,7 +168,6 @@
             <h4 class="offcanvas-title fw-bold" id="offcanvasTitle"></h4>
         </div>
         <div class="offcanvas-body" id="offcanvas-body">
-
         </div>
     </div>
 
@@ -396,12 +395,20 @@
                             let fighters = '';
                             for (const [key, value] of Object.entries(data[0].fighters)) {
                                 let index = parseInt(key) + 1
+                                let max = 7;
+                                let min = 1;
+                                let red = Math.floor(155 + ((value.since_last_fight - min) * (100 / (max - min))));
+                                let greenBlue = Math.floor((value.since_last_fight - min) * (255 / (max - min)));
+
+                                let color = `rgb(${red}, ${greenBlue}, ${greenBlue})`;
+
                                 fighters += `
                                     <tr class="fighter-row" onclick="setFighter(${value.id}, ${selectedRow})">
                                         <td>#${index}</td>
                                         <td><small>${value.name}</small></td>
                                         <td><small>${value.record.cartel}</small></td>
                                         <td class="text-center"><small>${value.ranking}</small></td>
+                                        <td  style="background-color: ${color};">${value.since_last_fight}</td>
                                     </tr>
                                 `
                             }

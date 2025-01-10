@@ -18,17 +18,6 @@
             </div>
 
             <div class="form-floating mt-5">
-                <select name="best-submission" class="form-select select-corner">
-                    {% for fight in submissions %}
-                        <option value="{{ fight.id }}">
-                            {{ fight.winner.name }} ~ [{{ fight.red_corner.name }} vs {{ fight.blue_corner.name }}]
-                        </option>
-                    {% endfor %}
-                </select>
-                <label for="floatingSelect">Submission of the Night</label>
-            </div>
-
-            <div class="form-floating mt-5">
                 <select name="best-ko" class="form-select select-corner">
                     {% for fight in kos %}
                         <option value="{{ fight.id }}">
@@ -37,6 +26,17 @@
                     {% endfor %}
                 </select>
                 <label for="floatingSelect">Knockout of the Night</label>
+            </div>
+
+            <div class="form-floating mt-5">
+                <select name="best-submission" class="form-select select-corner">
+                    {% for fight in submissions %}
+                        <option value="{{ fight.id }}">
+                            {{ fight.winner.name }} ~ [{{ fight.red_corner.name }} vs {{ fight.blue_corner.name }}]
+                        </option>
+                    {% endfor %}
+                </select>
+                <label for="floatingSelect">Submission of the Night</label>
             </div>
 
             <div class="form-floating mt-5">
