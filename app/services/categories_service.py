@@ -32,6 +32,7 @@ def format_short_category(category_description: str) -> str:
 def get_ranking(category_id: int = None) -> list:
     from app.services.category_fighters_service import get_fighter_ranking
     from app.services.fighters_service import get_by_category, format_record
+    from app.services.ranking_history_service import get_position_change
 
     list_fighters = []
     list_category = []
@@ -48,7 +49,8 @@ def get_ranking(category_id: int = None) -> list:
                 'id': fighter.id,
                 'name': fighter.name,
                 'record': format_record(fighter),
-                'ranking': get_fighter_ranking(fighter.id, category_id)
+                'ranking': get_fighter_ranking(fighter.id, category_id),
+                'position_change': get_position_change(fighter.id, category_id),
             })
 
         list_category.append({

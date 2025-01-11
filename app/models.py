@@ -87,3 +87,14 @@ class RankingPointsHistoric(db.Model):
 
     fighter: Mapped[Fighter] = db.relationship("Fighter", backref="ranking_historic")
     category: Mapped[Category] = db.relationship("Category", backref="ranking_historic")
+
+class RankingHistory(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    event_id: Mapped[int] = mapped_column(Integer, ForeignKey('event.id'), nullable=False)
+    fighter_id: Mapped[int] = mapped_column(Integer, ForeignKey('fighter.id'), nullable=False)
+    category_id: Mapped[int] = mapped_column(Integer, ForeignKey('category.id'), nullable=False)
+    order: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    fighter: Mapped[Fighter] = db.relationship("Fighter", backref="ranking_history")
+    category: Mapped[Category] = db.relationship("Category", backref="ranking_history")
+    event: Mapped[Category] = db.relationship("Event", backref="ranking_history")

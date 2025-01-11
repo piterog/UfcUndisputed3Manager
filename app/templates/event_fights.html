@@ -5,6 +5,35 @@
         <div class="text-center">
             <h2>{{ event.description }}</h2>
         </div>
+        {% if rewards %}
+            <div class="card text-center mb-2">
+                <div class="card-header">
+                    Fight Awards
+                </div>
+                <div class="card-body">
+                    <div id="carouselExampleIndicators" class="carousel carousel-dark slide" data-bs-ride="true">
+                        {% for reward in rewards %}
+                            <div class="carousel-inner">
+                                <div class="carousel-item {% if loop.first %} active {% endif %}">
+                                    <h5 class="">{{ reward.type.capitalize() }} of the Night</h5>
+                                    <div class="award-winner fw-bold">{{ reward.winner_fighter}}</div>
+                                    <div class="award-fight small mb-3">#{{ reward.fight_number }} {{ reward.fighters }}</div>
+                                    <div class="award-round fw-thin fst-italic"> Round {{ reward.round }} {{ reward.time }}</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         <div id="sortable-container">
             {% for fight in fights %}
                 <form action="{{ url_for('fight_save_results', event_id=fight.event_id, fight_id=fight.id) }}" method="POST">

@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 
 {% block body%}
+    <style>
+        .icon-ranking {
+            width: 22px;
+            height: 22px;
+        }
+    </style>
+
     <div class="container-fluid mt-3">
        <div class="row">
             {% for category in categories %}
@@ -20,6 +27,16 @@
                                     </td>
                                     <td>{{ fighter.record.cartel }}</td>
                                     <td>{{ fighter.ranking }}</td>
+                                    <td>
+                                        <small>{{ fighter.position_change }}</small>
+                                        {% if fighter.position_change == 0 %}
+                                            <img src="{{ url_for('static', filename="ranking-maintain.svg") }}" class="icon-ranking">
+                                        {% elif fighter.position_change < 0 %}
+                                            <img src="{{ url_for('static', filename="ranking-down.svg") }}" class="icon-ranking">
+                                        {% else %}
+                                            <img src="{{ url_for('static', filename="ranking-up.svg") }}" class="icon-ranking">
+                                        {% endif %}
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </table>

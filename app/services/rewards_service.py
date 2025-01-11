@@ -45,3 +45,40 @@ def add_reward(type_reward: str, fighter_id: int, fight_id: int, category_id: in
 
 def has_reward(event_id: int) -> bool:
     return Reward.query.filter_by(event_id=event_id).count() > 0
+
+def get_rewards(event_id: int):
+    return Reward.query.filter_by(event_id=event_id).all()
+
+def get_rewards_details(event_id: int):
+    all_rewards = get_rewards(event_id)
+
+    award_list = []
+    previous_type = None
+    previous_fighter = None
+
+    for reward in all_rewards:
+        current_type = reward.type
+
+        if current_type == previous_type and current_type == "fight":
+            fighter_name = f"{reward.fighter.name} vs {previous_fighter}"
+            award_list.pop()
+        else:
+            fighter_name = reward.fighter.name
+
+        award_list.append({
+            'winner_fighter': fighter_name,
+            'fighters': f"{reward.fight.red_corner.name} vs {reward.fight.blue_corner.name}",
+            'fight_number': reward.fight.number,
+            'round': reward.fight.round,
+            'time': reward.fight.time,
+            'type': current_type,
+        })
+
+        if current_type == "fight":
+            previous_fighter = fighter_name
+            previous_type = current_type
+        else:
+            previous_type = None
+            previous_fighter = None
+
+    return award_list

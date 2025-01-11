@@ -9,7 +9,7 @@ from app.services.fighters_service import get_all_fighters
 from app.services.fights_service import get_fights_from_event, remove_fights_by_event, create_fight, has_event_started, \
     is_event_completed, has_event_finished
 from app.forms.event import EventForm
-from app.services.rewards_service import add_rewards
+from app.services.rewards_service import add_rewards, get_rewards_details
 
 
 def index():
@@ -34,7 +34,9 @@ def event_build(event_id: int):
 def event_fights(event_id: int):
     fights = get_fights_from_event(event_id)
     event = get_event_details(event_id)
-    return render_template('event_fights.html', fights=fights, event=event)
+    rewards = get_rewards_details(event_id)
+
+    return render_template('event_fights.html', fights=fights, event=event, rewards=rewards)
 
 def event_awards(event_id: int):
     fights = get_fights_from_event(event_id)
