@@ -17,8 +17,14 @@ def get_event_details(event_id):
         return None
     return event
 
-def get_last_event_id(offset: int = 0):
-    return Event.query.order_by(Event.id.desc()).offset(offset).first().id
+def get_last_event_id(offset: int = 0, finished: bool = False):
+    query = Event.query
+    if finished:
+        query = query.filter(Event.event_completed_at.isnot(None))
+    return query.order_by(Event.id.desc()).offset(offset).first().id
+
+def get_last_event_completed():
+    return Event.query.order_by(Event.id.desc()).first()
 
 def mark_event_completed(event_id: int) -> None:
     update_in_db(Event, {'id': event_id}, {'event_completed_at': datetime.now()})

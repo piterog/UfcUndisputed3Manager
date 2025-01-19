@@ -15,8 +15,8 @@ def snapshot_fighters() -> None:
 
 
 def get_position_change(fighter_id:int, category_id: int):
-    last_event_id = get_last_event_id()
-    penultimate_event_id = get_last_event_id(1)
+    last_event_id = get_last_event_id(finished=True)
+    penultimate_event_id = get_last_event_id(offset=1, finished=True)
 
     last_ranking_position = RankingHistory.query.filter_by(event_id=last_event_id, fighter_id=fighter_id, category_id=category_id).order_by(RankingHistory.id.desc()).first()
     penultimate_ranking_position = RankingHistory.query.filter_by(event_id=penultimate_event_id, fighter_id=fighter_id, category_id=category_id).order_by(RankingHistory.id.desc()).first()

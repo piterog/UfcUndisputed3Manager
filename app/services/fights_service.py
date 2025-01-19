@@ -169,8 +169,10 @@ def get_fight_historic(fighter_id: int) -> dict:
 
     fights = Fight.query.filter(
                 (Fight.red_corner_id == fighter_id) | (Fight.blue_corner_id == fighter_id)
+            ).filter(
+                Fight.save_fight_at.isnot(None)
             ).order_by(
-                Fight.created_at.desc()
+                Fight.created_at.desc(),
             ).all()
 
     fight_list = []
