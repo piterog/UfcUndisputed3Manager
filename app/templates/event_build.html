@@ -2,9 +2,6 @@
 
 {% block body%}
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/base.min.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="{{ url_for('static', filename="card-behavior.js") }}"></script>
 
@@ -35,7 +32,7 @@
                                     </select>
                                     <label class="red" for="floatingSelect">Red Corner</label>
                                     <div class="cartel-info float-start mt-1">
-                                        <span class="cartel-red"></span>
+                                        <span class="cartel-red fighter-link"></span>
                                         <img src="{{ url_for('static', filename="info.svg") }}" alt="">
                                     </div>
                                 </div>
@@ -62,7 +59,7 @@
                                     <label class="blue" for="floatingSelect">Blue Corner</label>
                                     <div class="cartel-info float-end mt-1">
                                         <img src="{{ url_for('static', filename="info.svg") }}" alt="">
-                                        <span class="cartel-blue"></span>
+                                        <span class="cartel-blue fighter-link"></span>
                                     </div>
                                 </div>
                             </div>
@@ -163,6 +160,23 @@
         </form>
     </div>
 
+    <div class="modal fade text-dark" id="fighterModal" tabindex="-1" aria-labelledby="fighterModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="fighterModalLabel">Fighter Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="fighterModalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="offcanvas offcanvas-end text-dark" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" data-bs-dismiss="offcanvas" aria-labelledby="offcanvasScrollingLabel">
         <div class="offcanvas-header">
             <h4 class="offcanvas-title fw-bold" id="offcanvasTitle"></h4>
@@ -240,9 +254,17 @@
 
                                 if (select === redCornerSelect) {
                                     redCartelSpan.textContent = fighter.record.cartel;
+                                    redCartelSpan.dataset.fighterId = fighter.id;
+                                    redCartelSpan.dataset.bsToggle = "modal";
+                                    redCartelSpan.dataset.bsTarget = "#fighterModal";
+                                    redCartelSpan.classList.add("fighter-link");
                                 }
                                 if (select === blueCornerSelect) {
                                     blueCartelSpan.textContent = fighter.record.cartel;
+                                    blueCartelSpan.dataset.fighterId = fighter.id;
+                                    blueCartelSpan.dataset.bsToggle = "modal";
+                                    blueCartelSpan.dataset.bsTarget = "#fighterModal";
+                                    blueCartelSpan.classList.add("fighter-link");
                                 }
                             }
                         }
@@ -355,6 +377,10 @@
                 const selectedOption = this.options[this.selectedIndex];
                 if (selectedOption && selectedOption.dataset.cartel) {
                     cartelSpan.textContent = selectedOption.dataset.cartel;
+                    cartelSpan.dataset.fighterId = selectedOption.value;
+                    cartelSpan.dataset.bsToggle = "modal";
+                    cartelSpan.dataset.bsTarget = "#fighterModal";
+                    cartelSpan.classList.add("fighter-link");
                 } else {
                     cartelSpan.textContent = '';
                 }
@@ -440,6 +466,85 @@
             })
         });
 
+        document.addEventListener('DOMContentLoaded', function() {
+            const fighterLinks = document.querySelectorAll('.fighter-link');
+
+            fighterLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const fighterId = this.getAttribute('data-fighter-id');
+
+                    axios.get(`/fighter/${fighterId}/details`)
+                        .then(response => {
+                            const data = response.data;
+
+                            let fights = '';
+                            for (const [key, value] of Object.entries(data.fights)) {
+                                let color = value.result === 'W' ? 'table-success' : 'table-danger';
+                                fights += `
+                                    <tr class="${color}">
+                                        <td>${value.result}</td>
+                                        <td>${value.opponent_name}</td>
+                                        <td>${value.category_short}</td>
+                                        <td>${value.event_description.toUpperCase()}</td>
+                                        <td>${value.method.toUpperCase()}</td>
+                                        <td>${value.time} / ${value.round}</td>
+                                    </tr>
+                                `
+                            }
+
+                            document.getElementById('fighterModalBody').innerHTML = `
+                                <div class="fighter-details">
+                                    <h4>${data.fighter.name} <small>[${data.fighter.record.cartel} <kbd>${data.fighter.record.only_manager.cartel}</kbd>]</small></h4>
+                                    <div class="info">
+                                        <p><span>Age:</span> ${data.fighter.age}</p>
+                                        <p><span>From:</span> ${data.fighter.from}</p>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-6">
+                                            <h5>WINS</h5>
+                                            <span>${data.fighter.record.only_manager.victories}</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <h5>LOSSES</h5>
+                                            <span>${data.fighter.record.only_manager.defeats}</span>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <h5># Fight History</h5>
+                                    <div class="row">
+                                        <div class="container">
+                                            <table class="table table-sm">
+                                                <thead class="">
+                                                    <tr>
+                                                        <th scope="col"></th>
+                                                        <th scope="col">Opponent</th>
+                                                        <th scope="col">Category</th>
+                                                        <th scope="col">Event</th>
+                                                        <th scope="col">Method</th>
+                                                        <th scope="col">Time / Round</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${fights}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        })
+                        .catch(error => {
+                            document.getElementById('fighterModalBody').innerHTML = `
+                                <div class="alert alert-danger">
+                                    Erro ao carregar os dados do lutador.
+                                </div>
+                            `;
+                            console.error('Erro:', error);
+                        });
+                });
+            });
+        });
     </script>
 {% endblock %}
 

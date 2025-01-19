@@ -39,7 +39,7 @@
                 <form action="{{ url_for('fight_save_results', event_id=fight.event_id, fight_id=fight.id) }}" method="POST">
                     <div class="schedule-item">
                         <div class="item-title fw-bold fs-6 fst-italic">
-                            <small>#{{ loop.index }} [{{ fight.id }}]</small>
+                            <small>#{{ loop.index }} <span class="text-muted">[{{ fight.id }}]</span></small>
                         </div>
                         {% if not fight.save_fight_at %}
                             <button type="submit" class="btn-save-fight">Save</button>
@@ -90,7 +90,7 @@
                                 </div>
                             </div>
                             <div class="col-6">
-                                <select name="round[{{ fight.id }}]" class="form-select-sm round-select" {{ disabled_inputs }} size="3">
+                                <select name="round[{{ fight.id }}]" class="form-select-sm round-select" {{ disabled_inputs }} size="3" required>
                                     <option value="1" {% if fight.round == 1 %} selected {% endif %}>1st round</option>
                                     <option value="2" {% if fight.round == 2 %} selected {% endif %}>2nd round</option>
                                     <option value="3" {% if fight.round == 3 %} selected {% endif %}>3rd round</option>
@@ -115,7 +115,7 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-floating float-end pt-5">
-                                        <h5 class="mt-2 red {% if fight.loser_id == fight.red_corner_id %} strikethrough-text {% endif %}">{{ fight.red_corner.name }}</h5>
+                                        <h5 data-fighter-id="{{ fight.red_corner_id }}" data-bs-toggle="modal" data-bs-target="#fighterModal" class="mt-2 red fighter-link {% if fight.loser_id == fight.red_corner_id %} strikethrough-text {% endif %}">{{ fight.red_corner.name }}</h5>
                                         <div class="cartel-info float-start mt-1">
                                             <span class="cartel-red"></span>
                                         </div>
@@ -131,7 +131,7 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-floating float-start pt-5">
-                                        <h5 class="mt-2 blue {% if fight.loser_id == fight.blue_corner_id %} strikethrough-text {% endif %}">{{ fight.blue_corner.name }}</h5>
+                                        <h5 data-fighter-id="{{ fight.blue_corner_id }}" data-bs-toggle="modal" data-bs-target="#fighterModal" class="mt-2 blue fighter-link {% if fight.loser_id == fight.blue_corner_id %} strikethrough-text {% endif %}">{{ fight.blue_corner.name }}</h5>
                                         <div class="cartel-info float-end mt-1">
                                             <span class="cartel-blue"></span>
                                         </div>
@@ -151,6 +151,22 @@
                                         <h6 class="fw-bold">{{ fight.category.description }}</h6>
                                     </div>
                                 </div>
+
+                                <div class="modal fade" id="fighterModal" tabindex="-1" aria-labelledby="fighterModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="fighterModalLabel">Fighter Details</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body" id="fighterModalBody">
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -158,7 +174,7 @@
             {% endfor %}
         </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const scheduleItems = document.querySelectorAll(".schedule-item");
@@ -195,6 +211,86 @@
                     if (timeInput.value > "05:00") {
                         timeInput.value = "05:00";
                     }
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const fighterLinks = document.querySelectorAll('.fighter-link');
+
+            fighterLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const fighterId = this.getAttribute('data-fighter-id');
+
+                    axios.get(`/fighter/${fighterId}/details`)
+                        .then(response => {
+                            const data = response.data;
+
+                            let fights = '';
+                            for (const [key, value] of Object.entries(data.fights)) {
+                                let color = value.result === 'W' ? 'table-success' : 'table-danger';
+                                fights += `
+                                    <tr class="${color}">
+                                        <td>${value.result}</td>
+                                        <td>${value.opponent_name}</td>
+                                        <td>${value.category_short}</td>
+                                        <td>${value.event_description.toUpperCase()}</td>
+                                        <td>${value.method.toUpperCase()}</td>
+                                        <td>${value.time} / ${value.round}</td>
+                                    </tr>
+                                `
+                            }
+
+                            document.getElementById('fighterModalBody').innerHTML = `
+                                <div class="fighter-details">
+                                    <h4>${data.fighter.name} <small>[${data.fighter.record.cartel} <kbd>${data.fighter.record.only_manager.cartel}</kbd>]</small></h4>
+                                    <div class="info">
+                                        <p><span>Age:</span> ${data.fighter.age}</p>
+                                        <p><span>From:</span> ${data.fighter.from}</p>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-6">
+                                            <h5>WINS</h5>
+                                            <span>${data.fighter.record.only_manager.victories}</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <h5>LOSSES</h5>
+                                            <span>${data.fighter.record.only_manager.defeats}</span>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <h5># Fight History</h5>
+                                    <div class="row">
+                                        <div class="container">
+                                            <table class="table table-sm">
+                                                <thead class="">
+                                                    <tr>
+                                                        <th scope="col"></th>
+                                                        <th scope="col">Opponent</th>
+                                                        <th scope="col">Category</th>
+                                                        <th scope="col">Event</th>
+                                                        <th scope="col">Method</th>
+                                                        <th scope="col">Time / Round</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${fights}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        })
+                        .catch(error => {
+                            document.getElementById('fighterModalBody').innerHTML = `
+                                <div class="alert alert-danger">
+                                    Erro ao carregar os dados do lutador.
+                                </div>
+                            `;
+                            console.error('Erro:', error);
+                        });
                 });
             });
         });

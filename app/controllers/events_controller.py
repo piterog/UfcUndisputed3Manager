@@ -9,6 +9,7 @@ from app.services.fighters_service import get_all_fighters
 from app.services.fights_service import get_fights_from_event, remove_fights_by_event, create_fight, has_event_started, \
     is_event_completed, has_event_finished
 from app.forms.event import EventForm
+from app.services.ranking_history_service import snapshot_fighters
 from app.services.rewards_service import add_rewards, get_rewards_details
 
 
@@ -62,6 +63,7 @@ def event_awards_save(event_id: int):
     ]
 
     add_rewards(rewards)
+    snapshot_fighters()
 
     return redirect(url_for('events'))
 
