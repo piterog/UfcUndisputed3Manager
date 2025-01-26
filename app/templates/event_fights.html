@@ -77,6 +77,12 @@
                                     </label>
                                 </div>
                                 <div class="form-check small">
+                                    <input class="form-check-input" type="radio" name="method[{{ fight.id }}]" id="splitdec-{{ fight.id }}" value="split_decision" {{ disabled_inputs }} {% if fight.method == 'split_decision' %} checked {% endif %}>
+                                    <label class="form-check-label small" for="splitdec-{{ fight.id }}">
+                                        SPLIT DEC
+                                    </label>
+                                </div>
+                                <div class="form-check small">
                                     <input class="form-check-input" type="radio" name="method[{{ fight.id }}]" id="majdec-{{ fight.id }}" value="majority_decision" {{ disabled_inputs }} {% if fight.method == 'majority_decision' %} checked {% endif %}>
                                     <label class="form-check-label small" for="majdec-{{ fight.id }}">
                                         MAJORITY DEC
@@ -182,6 +188,7 @@
             scheduleItems.forEach(item => {
                 const drawButton = item.querySelector('input[id^="draw-"]');
                 const majorityDecButton = item.querySelector('input[id^="majdec-"]');
+                const splitDecButton = item.querySelector('input[id^="splitdec-"]');
                 const unanDecButton = item.querySelector('input[id^="unadec-"]');
                 const timeInput = item.querySelector('input[type="time"]');
                 const methodButtons = item.querySelectorAll('input[name^="method-"]');
@@ -199,7 +206,7 @@
                     }
                 });
 
-                [majorityDecButton, unanDecButton].forEach(button => {
+                [splitDecButton, majorityDecButton, unanDecButton].forEach(button => {
                     button.addEventListener("change", function () {
                         if (button.checked) {
                             timeInput.value = "05:00";

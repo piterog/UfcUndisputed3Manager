@@ -137,7 +137,7 @@ def get_fighter_stats(fighter_id: int):
             wins_methods['ko_total'] += count
         elif method == 'submission':
             wins_methods['submission_total'] += count
-        elif method in ['unanimous_decision', 'majority_decision']:
+        elif method in ['unanimous_decision', 'majority_decision', 'split_decision']:
             wins_methods['decision_total'] += count
 
     for method, count in losses:
@@ -145,7 +145,7 @@ def get_fighter_stats(fighter_id: int):
             loss_methods['ko_total'] += count
         elif method == 'submission':
             loss_methods['submission_total'] += count
-        elif method in ['unanimous_decision', 'majority_decision']:
+        elif method in ['unanimous_decision', 'majority_decision', 'split_decision']:
             loss_methods['decision_total'] += count
 
     for key in list(wins_methods.keys()):

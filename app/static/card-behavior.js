@@ -39,7 +39,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const sortableItem = gloveElement.closest('.sortable-item');
         const redGlove = sortableItem.querySelector('.red-glove img');
         const blueGlove = sortableItem.querySelector('.blue-glove img');
-        const controlField = sortableItem.querySelector('input[name="control[]"]');
 
         if (gloveType === 'red') {
             if (redGlove.src.includes('red-selected.svg')) {
@@ -118,5 +117,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 belt.style.opacity = '0.1';
             }
         }
+    });
+
+    document.getElementById("randomize-control").addEventListener('click', function () {
+        const redGloves = document.querySelectorAll('.red-glove img');
+        const blueGloves = document.querySelectorAll('.blue-glove img');
+
+        function getRandomValue() {
+            return Math.floor(Math.random() * 2) + 1;
+        }
+
+        const randomSelections = Array.from({ length: 8 }, getRandomValue);
+
+        randomSelections.forEach((element, index) => {
+            const glove = element === 1 ? 'red' : 'blue';
+            toggleGloveSelection(redGloves[index], glove)
+        });
     });
 });
