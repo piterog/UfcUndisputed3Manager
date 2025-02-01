@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+
+{% block body%}
+    <style>
+        [class^="method"] { color: #537C69; font-weight: bold }
+        .method-ko { color: #dc3545; }
+        .method-tko { color: #fd7e14; }
+        .method-submission { color: #0d6efd; }
+        .winner { color: #198754; }
+        .loser { color: #dc3545; }
+        .stat-card {
+            background-color: #f8f9fa;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        .champion-card {
+            transition: transform 0.2s;
+        }
+        .champion-card:hover {
+            transform: translateY(-2px);
+        }
+        .stats-card {
+            transition: transform 0.2s;
+            height: 100%;
+        }
+        .stats-card:hover {
+            transform: translateY(-2px);
+        }
+        .category-title {
+            border-left: 4px solid #0d6efd;
+            padding-left: 10px;
+            margin: 20px 0;
+        }
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .bg-fights { background-color: #e3f2fd; }
+        .bg-victories { background-color: #e8f5e9; }
+        .bg-defeats { background-color: #ffebee; }
+        .bg-time { background-color: #fff3e0; }
+        .bg-titles { background-color: #f3e5f5; }
+        .bg-streaks { background-color: #e0f2f1; }
+        .bg-records { background-color: #fce4ec; }
+    </style>
+    <div class="container py-4">
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-gamepad me-2"></i>
+                            Last Event: <b>{{ last_n_fights[0].event.description }}</b>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% for fight in last_n_fights %}
+                            <div class="border-start border-4 border-primary ps-3 mb-3">
+                                <div class="fw-bold">
+                                    <span class="winner">{{ fight.winner.name }}</span> def.
+                                    <span class="loser">{{ fight.loser.name }}</span>
+                                </div>
+                                <div class="text-muted">
+                                    via <span class="method-{{ fight.method }}">{{ fight.method }}</span> - Round {{ fight.round }} at {{ fight.time }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Finish Methods Statistics
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            {% for key, value in fight_statistics %}
+                                <div class="col-md-4 col-6">
+                                    <div class="stat-card text-center">
+                                        <h3 class="method-{{ key }} mb-1">{{ value }}</h3>
+                                        <div class="text-muted">{{ key }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fight Statistics -->
+
+
+        <!-- Champions Section -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-trophy me-2"></i>
+                    Champions Pound for Pound
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    {% for ranking in pound_4_pound_ranking %}
+                        <div class="col-12">
+                            <div class="champion-card bg-light p-3 rounded d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="h4 text-muted mb-0">#{{ loop.index }}</span>
+                                    <div>
+                                        <h5 class="mb-1">{{ ranking.champion_name}}</h5>
+                                        <small class="text-muted">{{ ranking.category_name}}</small>
+                                    </div>
+                                </div>
+                                <div>
+                                    <i class="fas fa-medal text-warning me-2"></i>
+                                    <span class="fw-bold">{{ ranking.total_points }} pts</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <h2 class="mb-4">Fighter Statistics Report</h2>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stat-icon bg-fights">
+                                <i class="fas fa-fist-raised text-primary"></i>
+                            </div>
+                            <h6 class="card-subtitle mb-0">Most Fights</h6>
+                        </div>
+                        <h4 class="card-title mb-1">{{ fighter_statistics['most_fights'][1] }}</h4>
+                        <p class="card-text text-muted">{{ fighter_statistics['most_fights'][2] }} fights</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stat-icon bg-fights">
+                                <i class="fas fa-fist-raised text-primary"></i>
+                            </div>
+                            <h6 class="card-subtitle mb-0">Least Fights</h6>
+                        </div>
+                        <h4 class="card-title mb-1">{{ fighter_statistics['least_fights'][1] }}</h4>
+                        <p class="card-text text-muted">{{ fighter_statistics['least_fights'][2] }} fights</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vitórias -->
+        <h4 class="category-title">Record of Victories</h4>
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stat-icon bg-victories">
+                                <i class="fas fa-trophy text-success"></i>
+                            </div>
+                            <h6 class="card-subtitle mb-0">Most Wins</h6>
+                        </div>
+                        <h4 class="card-title mb-1">{{ fighter_statistics['most_victories'][1] }}</h4>
+                        <p class="card-text text-muted">{{ fighter_statistics['most_victories'][2] }} victories</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stat-icon bg-victories">
+                                <i class="fas fa-bolt text-success"></i>
+                            </div>
+                            <h6 class="card-subtitle mb-0">Most KO Wins</h6>
+                        </div>
+                        <h4 class="card-title mb-1">{{ fighter_statistics['most_ko_wins'][1] }}</h4>
+                        <p class="card-text text-muted">{{ fighter_statistics['most_ko_wins'][2] }} KOs</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stat-icon bg-victories">
+                                <i class="fas fa-hand-rock text-success"></i>
+                            </div>
+                            <h6 class="card-subtitle mb-0">Most TKO Wins</h6>
+                        </div>
+                        <h4 class="card-title mb-1">{{ fighter_statistics['most_tko_wins'][1] }}</h4>
+                        <p class="card-text text-muted">{{ fighter_statistics['most_tko_wins'][2] }} TKOs</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stat-icon bg-victories">
+                                <i class="fas fa-handshake text-success"></i>
+                            </div>
+                            <h6 class="card-subtitle mb-0">Most Submission Wins</h6>
+                        </div>
+                        <h4 class="card-title mb-1">{{ fighter_statistics['most_submission_wins'][1] }}</h4>
+                        <p class="card-text text-muted">{{ fighter_statistics['most_submission_wins'][2] }} Submissions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Derrotas -->
+        <h4 class="category-title">Record of Losses</h4>
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stat-icon bg-defeats">
+                                <i class="fas fa-times-circle text-danger"></i>
+                            </div>
+                            <h6 class="card-subtitle mb-0">Most Losses</h6>
+                        </div>
+                        <h4 class="card-title mb-1">{{ fighter_statistics['most_defeats'][1] }}</h4>
+                        <p class="card-text text-muted">{{ fighter_statistics['most_defeats'][2] }} defeats</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tempo -->
+        <h4 class="category-title">Time Records</h4>
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stat-icon bg-time">
+                                <i class="fas fa-clock text-warning"></i>
+                            </div>
+                            <h6 class="card-subtitle mb-0">Fastest KO</h6>
+                        </div>
+                        <h4 class="card-title mb-1">{{ fighter_statistics['fastest_ko'][1] }}</h4>
+                        <p class="card-text text-muted">Round {{ fighter_statistics['fastest_ko'][3] }} at {{ fighter_statistics['fastest_ko'][2] }} </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stat-icon bg-time">
+                                <i class="fas fa-clock text-warning"></i>
+                            </div>
+                            <h6 class="card-subtitle mb-0">Fastest Submission</h6>
+                        </div>
+                        <h4 class="card-title mb-1">{{ fighter_statistics['fastest_submission'][1] }}</h4>
+                        <p class="card-text text-muted">Round {{ fighter_statistics['fastest_submission'][3] }} at {{ fighter_statistics['fastest_submission'][2] }} </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sequências -->
+        <h4 class="category-title">Records of Sequence</h4>
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stat-icon bg-streaks">
+                                <i class="fas fa-chart-line text-info"></i>
+                            </div>
+                            <h6 class="card-subtitle mb-0">Longest Winning Streak</h6>
+                        </div>
+                        <h4 class="card-title mb-1">{{ fighter_statistics['longest_win_streak'][1] }}</h4>
+                        <p class="card-text text-muted">{{ fighter_statistics['longest_win_streak'][2] }} Wins </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stat-icon bg-streaks">
+                                <i class="fas fa-chart-line text-info"></i>
+                            </div>
+                            <h6 class="card-subtitle mb-0">Current Winning Streak</h6>
+                        </div>
+                        <h4 class="card-title mb-1">{{ fighter_statistics['current_win_streak'][1] }}</h4>
+                        <p class="card-text text-muted">{{ fighter_statistics['current_win_streak'][2] }} Wins </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Títulos -->
+        <h4 class="category-title">Records of Title</h4>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stat-icon bg-titles">
+                                <i class="fas fa-crown text-purple"></i>
+                            </div>
+                            <h6 class="card-subtitle mb-0">Maior Defesa de Títulos</h6>
+                        </div>
+                        <h4 class="card-title mb-1">{{ fighter_statistics['most_title_defenses'][1] }}</h4>
+                        <p class="card-text text-muted">{{ fighter_statistics['most_title_defenses'][2] }} Wins </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stat-icon bg-titles">
+                                <i class="fas fa-crown text-purple"></i>
+                            </div>
+                            <h6 class="card-subtitle mb-0">Mais Disputas de Título</h6>
+                        </div>
+                        <h4 class="card-title mb-1">{{ fighter_statistics['most_title_shots'][1] }}</h4>
+                        <p class="card-text text-muted">{{ fighter_statistics['most_title_shots'][2] }} Wins </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

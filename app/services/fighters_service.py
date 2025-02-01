@@ -106,13 +106,15 @@ def get_fighter_details(fighter_id):
     fighter = get_fighter(fighter_id)
 
     fights = get_fight_historic(fighter_id)
+    
+    results = get_results_resume(fighter_id)
 
     return dict(fighter={
         'name': fighter.name,
         'age': fighter.age,
         'record': format_record(fighter),
         'from': fighter.country,
-    }, fights=fights)
+    }, fights=fights, results=results)
 
 def get_fighter_stats(fighter_id: int):
     wins = get_lost_or_won_fights_grouped_by_method(fighter_id, True)
@@ -203,3 +205,19 @@ def fighters_list_inactivity():
         fighter_dic[fighter.id] = fighter.events_since_last_fight
 
     return fighter_dic
+
+def get_results_resume(fighter_id: int):
+    fighter_stats = get_fighter_stats(fighter_id)
+    
+    return {
+        "wins": {
+            "kos": fighter_stats['wins_methods']['ko_total'],
+            "submissions": fighter_stats['wins_methods']['submission_total'],
+            "decisions": fighter_stats['wins_methods']['decision_total']
+        },
+        "losses": {
+            "kos": fighter_stats['loss_methods']['ko_total'],
+            "submissions": fighter_stats['loss_methods']['submission_total'],
+            "decisions": fighter_stats['loss_methods']['decision_total']
+        }
+    }

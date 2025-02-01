@@ -209,3 +209,27 @@
 .fighter-link {
     cursor: pointer
 }
+
+.result-container {
+    display: inline-flex;
+}
+
+.result-container .text-block {
+    padding-top: 3px;
+}
+
+.result-container.win-block {
+    border: 1px solid #d1e7dd;
+}
+
+.result-container.win-block .text-block{
+    background-color: #d1e7dd;
+}
+
+.result-container.lose-block {
+    border: 1px solid #f8d7da;
+}
+
+.result-container.lose-block .text-block{
+    background-color: #f8d7da;
+}
