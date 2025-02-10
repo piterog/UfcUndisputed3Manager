@@ -24,6 +24,12 @@ def create_app(config_name=None):
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
+    if app.config['ENV'] == 'production':
+        app.config['SESSION_COOKIE_SECURE'] = True
+        app.config['SESSION_COOKIE_HTTPONLY'] = True
+        app.config['REMEMBER_COOKIE_SECURE'] = True
+        app.config['REMEMBER_COOKIE_HTTPONLY'] = True
+
     def format_datetime(value, format="%d/%m/%Y %H:%M:%S"):
         if isinstance(value, datetime):
             return value.astimezone(pytz.timezone('America/Sao_Paulo')).strftime(format)
@@ -32,7 +38,11 @@ def create_app(config_name=None):
     app.jinja_env.filters['datetime'] = format_datetime
     
     db.init_app(app)
+
     setup_logging(app)
+
     register_routes(app)
 
     return app
+    
+app = create_app()
