@@ -1,8 +1,8 @@
 from app.services.events_service import get_last_event_completed
 from app.models import Fight, Event, Fighter, RankingPointsHistoric, Category
-from sqlalchemy import func, desc, case, literal_column, Integer
+from sqlalchemy import func, desc, case, literal_column, Integer, TIMESTAMP
 from datetime import datetime
-
+from sqlalchemy.sql import text
 
 def get_last_event():
     return get_last_event_completed()
@@ -153,7 +153,7 @@ def get_fighter_statistics():
         Fighter.id,
         Fighter.name,
         func.sum(
-            func.cast(func.strftime('%s', Fight.time), Integer) +
+            func.extract('epoch', text("TIME '00:00' + Fight.time::INTERVAL")) +
             (Fight.round - 1) * 300
         ).label('total_time')
     ).join(
@@ -165,7 +165,7 @@ def get_fighter_statistics():
         Fighter.id,
         Fighter.name,
         func.sum(
-            func.cast(func.strftime('%s', Fight.time), Integer) +
+            func.extract('epoch', text("TIME '00:00' + Fight.time::INTERVAL")) +
             (Fight.round - 1) * 300
         ).label('total_time')
     ).join(
@@ -224,17 +224,17 @@ def get_fighter_statistics():
         streak_query = Fighter.query.with_entities(
             Fighter.id,
             Fighter.name,
-            func.count().label('streak_count')
+            func.count().label('streak_count'),
+	    func.max(Fight.created_at).label('latest_fight')
         ).join(
             Fight,
             (Fighter.id == (Fight.winner_id if is_victory else Fight.loser_id))
-        )
+        ).group_by(Fighter.id)
 
         if is_current:
-            # Para sequências atuais, precisamos ordenar por data e verificar apenas as lutas mais recentes
-            streak_query = streak_query.order_by(Fight.created_at.desc())
+            streak_query = streak_query.order_by(desc('latest_fight'))
 
-        return streak_query.group_by(Fighter.id).order_by(desc('streak_count')).first()
+        return streak_query.order_by(desc('streak_count')).first()
 
     longest_win_streak = get_streak_subquery(is_current=False, is_victory=True)
     longest_loss_streak = get_streak_subquery(is_current=False, is_victory=False)

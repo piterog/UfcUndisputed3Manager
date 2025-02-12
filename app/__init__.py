@@ -25,8 +25,6 @@ def create_app(config_name=None):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     def format_datetime(value, format="%d/%m/%Y %H:%M:%S"):
-        if isinstance(value, datetime):
-            return value.astimezone(pytz.timezone('America/Sao_Paulo')).strftime(format)
         return value
 
     app.jinja_env.filters['datetime'] = format_datetime
